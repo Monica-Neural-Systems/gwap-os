@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>IC ROOT // Sourdough OS Operating Engine & 5-Builder Squad Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #09090b; color: #f4f4f5; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-heading { font-family: 'Space Grotesk', sans-serif; }
+    
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.15; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.08); }
+    }
+    .ambient-glow { animation: pulseGlow 8s ease-in-out infinite; }
+    
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #27272a;
+      height: 8px;
+      border-radius: 9999px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f59e0b;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
+      border: 3px solid #09090b;
+      transition: all 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    
+    .tab-btn.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    @keyframes pulseRecording {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.85; }
+    }
+    .pulse-recording {
+      animation: pulseRecording 1.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col justify-between items-center px-4 py-6 relative overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <!-- Ambient Light Backdrop -->
+  <div class="ambient-glow absolute top-10 w-[42rem] h-[42rem] bg-amber-500/10 blur-[180px] pointer-events-none rounded-full"></div>
+  <div class="ambient-glow absolute bottom-10 w-[36rem] h-[36rem] bg-cyan-500/10 blur-[180px] pointer-events-none rounded-full"></div>
+
+  <!-- Header Navigation -->
+  <header class="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between py-3.5 px-6 rounded-2xl border border-white/10 bg-zinc-950/80 backdrop-blur-2xl mb-6 z-30 shadow-2xl gap-4">
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-cyan-400 to-emerald-400 p-[1.5px] flex items-center justify-center shadow-lg">
+        <div class="w-full h-full bg-zinc-950 rounded-[10px] flex items-center justify-center">
+          <span class="font-mono font-black text-xs text-amber-400">IC</span>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-heading font-black text-sm tracking-wider uppercase text-white">IC ROOT</span>
+          <span class="text-[10px] font-mono font-bold bg-amber-400/10 text-amber-400 px-2 py-0.5 rounded border border-amber-400/20">SOURDOUGH OS ENGINE</span>
+        </div>
+        <div class="text-[11px] font-mono text-zinc-400">DIGAMONI ARCHITECTURE // michael@digamoni.ca</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex flex-wrap items-center justify-center gap-1.5 font-mono text-xs bg-zinc-900/80 p-1.5 rounded-xl border border-white/10">
+      <button onclick="switchTab('landing')" id="tab-landing" class="tab-btn active px-3 py-1.5 rounded-lg border border-transparent text-zinc-300 hover:text-white transition">0. Overview & Quiz</button>
+      <button onclick="switchTab('boss')" id="tab-boss" class="tab-btn px-3 py-1.5 rounded-lg border border-transparent text-zinc-300 hover:text-white transition">1. Boss Intake & Bids</button>
+      <button onclick="switchTab('builder')" id="tab-builder" class="tab-btn px-3 py-1.5 rounded-lg border border-transparent text-zinc-300 hover:text-white transition">2. Builder Sandbox</button>
+      <button onclick="switchTab('telemetry')" id="tab-telemetry" class="tab-btn px-3 py-1.5 rounded-lg border border-transparent text-zinc-300 hover:text-white transition">3. Sourdough Telemetry</button>
+      <button onclick="switchTab('payday')" id="tab-payday" class="tab-btn px-3 py-1.5 rounded-lg border border-transparent text-zinc-300 hover:text-white transition">4. Finance Payday</button>
+    </nav>
+
+    <!-- Quick Scenario Presets -->
+    <div class="flex items-center gap-2">
+      <button onclick="loadDemoScenario()" class="px-3 py-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 font-mono text-xs text-amber-300 transition flex items-center gap-1.5" title="Load Regina Machine Shop Handover Demo">
+        <span>⚡</span> Load Demo
+      </button>
+      <button onclick="resetSystem()" class="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-white/10 font-mono text-xs text-zinc-400 transition" title="Reset System State">
+        ↺ Reset
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 w-full max-w-6xl space-y-8 flex-1">
+
+    <!-- ==================== TAB 0: PUBLIC OVERVIEW & QUIZ ==================== -->
+    <div id="view-landing" class="space-y-10">
+      <section class="text-center space-y-4 pt-2">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-400/20 bg-amber-400/5 backdrop-blur-xl text-xs tracking-widest uppercase font-mono text-amber-400">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>The Post-Meeting Operating System</span>
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+          Kill the meeting. <br class="hidden sm:inline"/>
+          Feed the culture. <br class="hidden sm:inline"/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-100">
+            Pay the builder.
+          </span>
+        </h1>
+        <p class="text-zinc-400 text-base sm:text-lg max-w-3xl mx-auto font-light leading-relaxed">
+          Traditional corporate pecking orders waste 57% of your payroll on status updates and quiet self-censorship. 
+          Deploy 1 squad (5 builders) against 1 acute company bottleneck with zero app installs, complete situational anonymity, and CRA-compliant payroll bonuses.
+        </p>
+        <div class="pt-2 flex flex-wrap justify-center gap-3">
+          <button onclick="switchTab('boss')" class="px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs font-mono tracking-widest uppercase transition shadow-xl shadow-amber-500/20">
+            Launch 1 Problem Squad (Boss Intake) →
+          </button>
+          <button onclick="switchTab('builder')" class="px-6 py-3 rounded-xl bg-white/[0.05] hover:bg-white/10 text-white font-bold text-xs font-mono tracking-widest uppercase border border-white/10 transition">
+            Test Builder Mobile Sandbox →
+          </button>
+        </div>
+      </section>
+
+      <!-- Dinosaur Index Quiz -->
+      <section class="backdrop-blur-2xl bg-zinc-900/50 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/10 gap-2">
+          <div>
+            <span class="text-xs uppercase font-mono tracking-widest text-amber-400 block mb-1">Diagnostic Hook // Step 01</span>
+            <h2 class="text-2xl font-black text-white">The 60-Second Dinosaur Index Quiz</h2>
+          </div>
+          <span class="text-xs font-mono text-zinc-400">Measure Submissive Restraint Payroll Bleed</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="space-y-5">
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono text-zinc-300">
+                <span>1. SQUAD SIZE (BUILDERS)</span>
+                <span id="quiz-team-label" class="text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">15 PEOPLE</span>
+              </div>
+              <input id="quiz-team" type="range" min="5" max="100" value="15" oninput="runQuiz()" class="w-full cursor-pointer">
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono text-zinc-300">
+                <span>2. WEEKLY MEETING LOAD (HOURS / PERSON)</span>
+                <span id="quiz-hours-label" class="text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">8 HOURS / WK</span>
+              </div>
+              <input id="quiz-hours" type="range" min="2" max="25" value="8" oninput="runQuiz()" class="w-full cursor-pointer">
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono text-zinc-300">
+                <span>3. AVERAGE BUILDER SALARY</span>
+                <span id="quiz-salary-label" class="text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">$75,000 / YR</span>
+              </div>
+              <input id="quiz-salary" type="range" min="40000" max="200000" step="5000" value="75000" oninput="runQuiz()" class="w-full cursor-pointer">
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-xs font-mono text-zinc-300 block">4. WHAT HAPPENS WHEN AN EMPLOYEE SPOTS A COST-SAVING FIX?</label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button type="button" id="opt-fate-a" onclick="setFate('a')" class="p-2.5 rounded-xl border border-red-500/40 bg-red-500/10 text-red-300 font-mono text-xs text-left transition">
+                  A) Quiet Silence (Restraint)
+                </button>
+                <button type="button" id="opt-fate-b" onclick="setFate('b')" class="p-2.5 rounded-xl border border-white/10 bg-white/[0.02] text-zinc-400 font-mono text-xs text-left transition hover:border-white/20">
+                  B) Shot Down in Status Sync
+                </button>
+                <button type="button" id="opt-fate-c" onclick="setFate('c')" class="p-2.5 rounded-xl border border-white/10 bg-white/[0.02] text-zinc-400 font-mono text-xs text-left transition hover:border-white/20">
+                  C) Direct Cash Bonus
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-zinc-950/80 border border-amber-500/30 space-y-5 text-center shadow-xl">
+            <div>
+              <span class="text-[11px] font-mono uppercase tracking-widest text-zinc-500 block mb-1">Estimated Annual Meeting Bleed</span>
+              <div id="quiz-waste-display" class="text-4xl sm:text-5xl font-black font-mono text-amber-400">$216,346</div>
+              <div class="text-[11px] font-mono text-zinc-400 mt-1">Burned in non-productive sync rituals</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
+              <div class="text-left">
+                <span class="text-[10px] font-mono uppercase text-zinc-500 block">Restraint Vulnerability</span>
+                <span id="quiz-restraint-display" class="text-xl font-bold font-mono text-red-400">82% (CRITICAL)</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] font-mono uppercase text-emerald-400 block">Reclaimable Capital (75%)</span>
+                <span id="quiz-reclaim-display" class="text-xl font-bold font-mono text-emerald-300">+$162,260</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-xs text-amber-200 font-mono text-left leading-relaxed">
+              <strong>Root Diagnosis:</strong> Your front-line operators hold empirical solutions right now, but corporate pecking orders keep them silent. Sourdough OS converts friction into velocity.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== TAB 1: BOSS INTAKE & BID-FORWARD ==================== -->
+    <div id="view-boss" class="hidden space-y-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/10 gap-3">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest text-amber-400 font-bold">Boss Operational Console</span>
+          <h2 class="text-3xl font-black text-white">Load 1 Acute Bottleneck & Deploy Squad</h2>
+          <p class="text-xs text-zinc-400 mt-1">Ingest a physical or software bottleneck, lock the Gravy Boat pool, and air-gap 5 builder nodes.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="boss-squad-status" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-400/10 text-amber-400 border border-amber-400/30">
+            SQUAD STATUS: READY FOR INTAKE
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Input Form (Left 2 Columns) -->
+        <div class="lg:col-span-2 backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-6 space-y-5">
+          <form id="boss-form" onsubmit="handleBossIntake(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Company / Facility Name</label>
+                <input id="boss-company" type="text" required value="DynaIndustrial LP (Regina Plant)" class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-400">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Executive / Owner Email</label>
+                <input id="boss-email" type="email" required value="ops-director@dynaindustrial.com" class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-400">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono text-zinc-400 mb-1">Acute Bottleneck Target / Machine Failure</label>
+              <input id="boss-problem-title" type="text" required value="Line 2 Secondary Manifold Handover Fitting Failure" class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-400">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Point A: Current Failure State (The Waste)</label>
+                <textarea id="boss-point-a" rows="3" required class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-400">Recurring fitting deformation on Line 2 secondary manifold during shift handover. Scrapping $12,000/mo in custom machined parts. Day shift blames night shift; night shift blames torque specs.</textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Point B: Target Operational Spec (The Verified Fix)</label>
+                <textarea id="boss-point-b" rows="3" required class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-400">Zero scrapped fittings across 14 consecutive shifts. Standardized thermal torque calibration identified and verified before spindle engage.</textarea>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Bounty Pool ($ CAD)</label>
+                <input id="boss-bounty" type="number" min="500" step="100" value="2000" oninput="updateBountyPreview()" class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-400">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Squad Builder Seats</label>
+                <input id="boss-seats" type="number" value="5" readonly class="w-full bg-zinc-950/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-400 cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-zinc-400 mb-1">Trial Window</label>
+                <input type="text" value="14 Days (Zero Risk)" readonly class="w-full bg-zinc-950/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-emerald-400 font-bold cursor-not-allowed">
+              </div>
+            </div>
+
+            <div class="pt-3">
+              <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-black font-black text-xs font-mono tracking-widest uppercase transition shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2">
+                <span>⚡</span> Ingest Problem & Provision 5-Builder Air Gap
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Assistant Intake & Token Vault (Right Column) -->
+        <div class="space-y-5">
+          <!-- Gravy Boat Split Preview -->
+          <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 space-y-3">
+            <span class="text-[11px] font-mono uppercase tracking-widest text-amber-400 font-bold block">Gravy Boat Bounty Distribution</span>
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between p-2 rounded-lg bg-zinc-950/80 border border-white/5">
+                <span class="text-zinc-400">Attempt Floor (5% pool):</span>
+                <span id="split-floor" class="text-amber-400 font-bold">$100 Pool ($20/builder)</span>
+              </div>
+              <div class="flex justify-between p-2 rounded-lg bg-zinc-950/80 border border-white/5">
+                <span class="text-zinc-400">Root-Cause Fixer (75%):</span>
+                <span id="split-fixer" class="text-emerald-400 font-bold">$1,500 Primary</span>
+              </div>
+              <div class="flex justify-between p-2 rounded-lg bg-zinc-950/80 border border-white/5">
+                <span class="text-zinc-400">Recon Partner (20%):</span>
+                <span id="split-recon" class="text-cyan-400 font-bold">$400 Dead-End Elimination</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-mono leading-relaxed pt-1">
+              "Everyone who tests earns. Fixing the bottleneck pays the bounty. Zero loser's drag."
+            </p>
+          </div>
+
+          <!-- Provisioned Anonymous Claim Links -->
+          <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-bold">5 Builder Claim Links</span>
+              <span class="text-[10px] font-mono text-zinc-500">Air-Gapped</span>
+            </div>
+            <div id="builder-token-list" class="space-y-2 text-xs font-mono">
+              <!-- Dynamically populated tokens -->
+            </div>
+            <p class="text-[10px] text-zinc-500 font-mono leading-relaxed">
+              * Send these 5 unique links to your 5 operators. No logins, no names, zero fear of status penalty.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bid-Forward Queue (Reverse Intake / Builder Bottleneck Bidding) -->
+      <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-white/10">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono uppercase tracking-widest text-cyan-400 font-bold">Reverse Intake Board</span>
+              <span class="text-[10px] font-mono bg-cyan-400/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-400/20">Bid-Forward Queue</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mt-1">Shop-Floor Bottleneck Bids (Submitted by Builders)</h3>
+          </div>
+          <span class="text-xs font-mono text-zinc-400">1-Click Management Funding Approval</span>
+        </div>
+
+        <div id="bid-forward-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated Bid-Forward items -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: BUILDER PROVING GROUND ==================== -->
+    <div id="view-builder" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/10 gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono uppercase tracking-widest text-cyan-400 font-bold">Builder Proving Ground</span>
+            <span class="text-[10px] font-mono bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/20">Mobile Web PWA Simulator</span>
+          </div>
+          <h2 class="text-3xl font-black text-white">Private Socratic Proving Ground</h2>
+          <p class="text-xs text-zinc-400 mt-1">Total situational anonymity. Fail 20 times in private. Safe from meetings and management politics.</p>
+        </div>
+
+        <!-- Node Selector -->
+        <div class="flex items-center gap-2 bg-zinc-900 p-1.5 rounded-xl border border-white/10 font-mono text-xs">
+          <span class="text-zinc-500 text-[10px] px-2">NODE:</span>
+          <button onclick="selectBuilderNode(1)" id="btn-node-1" class="px-2.5 py-1 rounded-lg bg-cyan-400 text-black font-bold">#01</button>
+          <button onclick="selectBuilderNode(2)" id="btn-node-2" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white">#02</button>
+          <button onclick="selectBuilderNode(3)" id="btn-node-3" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white">#03</button>
+          <button onclick="selectBuilderNode(4)" id="btn-node-4" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white">#04</button>
+          <button onclick="selectBuilderNode(5)" id="btn-node-5" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white">#05</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left: Problem Context & AI Intensity -->
+        <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-6 space-y-5">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">Assigned Problem Target</span>
+            <h3 id="builder-assigned-target" class="text-base font-bold text-white font-mono">Line 2 Secondary Manifold Handover Fitting Failure</h3>
+          </div>
+
+          <div class="space-y-3 p-3.5 rounded-xl bg-zinc-950/70 border border-white/5 text-xs font-mono">
+            <div>
+              <span class="text-rose-400 font-bold block mb-0.5">Point A (Failure State):</span>
+              <p id="builder-point-a" class="text-zinc-400 leading-relaxed">Recurring fitting deformation during shift handover ($12k/mo scrap).</p>
+            </div>
+            <div class="pt-2 border-t border-white/5">
+              <span class="text-emerald-400 font-bold block mb-0.5">Point B (Target Spec):</span>
+              <p id="builder-point-b" class="text-zinc-400 leading-relaxed">Zero scrapped fittings, verified thermal torque calibration.</p>
+            </div>
+            <div class="pt-2 border-t border-white/5 flex justify-between items-center">
+              <span class="text-zinc-500">Bounty Pool:</span>
+              <span id="builder-bounty-display" class="text-amber-400 font-bold">$2,000 CAD</span>
+            </div>
+          </div>
+
+          <!-- Socratic AI Slider -->
+          <div class="space-y-2 pt-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="text-zinc-300">Worker AI Intensity</span>
+              <span id="ai-intensity-label" class="text-cyan-400 font-bold">LEVEL 3: SOCRATIC</span>
+            </div>
+            <input id="ai-intensity" type="range" min="1" max="4" value="3" oninput="updateIntensity()" class="w-full cursor-pointer">
+            <p id="ai-intensity-desc" class="text-[11px] font-mono text-zinc-400 leading-relaxed">
+              Level 3 (Socratic Sparring): Active co-builder. Validates engineering tolerances, checks math, spots edge cases, and prepares QuL8r deltas.
+            </p>
+          </div>
+
+          <!-- No-Fault Production Indemnity -->
+          <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold text-emerald-300 flex items-center gap-1.5">
+                <span>✓</span> No-Fault Indemnity
+              </span>
+              <span class="text-[10px] font-mono bg-emerald-500/20 text-emerald-200 px-2 py-0.5 rounded">ACTIVE</span>
+            </div>
+            <p class="text-[11px] font-mono text-zinc-400 leading-relaxed">
+              If this test fails on the floor, the company absorbs 100% of the cost. Zero penalty, zero status risk.
+            </p>
+          </div>
+
+          <!-- Reverse Bid Forward Trigger -->
+          <div class="pt-2">
+            <button onclick="openBidForwardModal()" class="w-full py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-mono text-xs text-cyan-300 transition flex items-center justify-center gap-2">
+              <span>+</span> Propose New Bottleneck (Bid Forward)
+            </button>
+          </div>
+        </div>
+
+        <!-- Center & Right: Proving Ground Sandbox -->
+        <div class="lg:col-span-2 backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-white/10 gap-2">
+            <div>
+              <span id="active-node-header" class="text-xs font-mono font-bold text-cyan-400">ACTIVE: #BUILDER-01 (Air-Gapped Private Session)</span>
+              <div class="text-[11px] font-mono text-zinc-500">Encrypted Claim Token: <span id="active-node-token" class="text-zinc-300 font-bold">#BLD-9281-01</span></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-[11px] font-mono text-emerald-400">SANDBOX ISOLATED</span>
+            </div>
+          </div>
+
+          <!-- Quick Observation Injections -->
+          <div class="space-y-2">
+            <span class="text-xs font-mono text-zinc-400 block">Inject Empirical Field Observations (Shop Floor Tests):</span>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="injectBuilderObservation('Thread Spec', 'Tested thread tolerances on batch #94. Thread pitch variance within 0.02mm.')" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-mono text-xs text-zinc-200 transition">
+                + Observation A (Thread Spec)
+              </button>
+              <button onclick="injectBuilderObservation('Thermal Delta', 'Discovered thermal 65°F shrinkage delta during handover. Manifold hot at 140°F cooldown creates deformation.')" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-mono text-xs text-cyan-300 transition">
+                + Observation B (Thermal Delta)
+              </button>
+              <button onclick="injectBuilderObservation('Verified Fix', 'Calibrated torque preset to 18 ft-lbs on wrench #4 before spindle engage. 100% seal integrity on test run.')" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-mono text-xs text-emerald-300 transition">
+                + Verified Fix C (18 ft-lb + Wrench #4)
+              </button>
+            </div>
+          </div>
+
+          <!-- Dictation / Text Area -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-mono text-zinc-400">Builder Telemetry Input (Voice or Text)</label>
+              <span id="voice-status" class="text-[10px] font-mono text-amber-400 hidden">● Recording Audio Telemetry...</span>
+            </div>
+            <textarea id="builder-notes" rows="4" placeholder="Speak or enter test results... (e.g., 'Checked hydraulic pressure drop on return line. No leaks found. Moving to thermal expansion analysis.')" class="w-full bg-zinc-950 border border-white/10 rounded-xl p-3.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-cyan-400 leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <button type="button" onclick="toggleVoiceSim()" id="btn-voice" class="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-mono text-xs text-zinc-300 transition flex items-center gap-2">
+              <span id="voice-icon">🎤</span>
+              <span id="voice-label">Push-to-Talk (Voice Memo)</span>
+            </button>
+            <button type="button" onclick="submitBuilderObservation()" class="px-6 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold font-mono text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+              <span>⚡</span> Transmit to Telemetry Compiler →
+            </button>
+          </div>
+
+          <!-- Proving Session Log -->
+          <div class="pt-4 border-t border-white/10 space-y-2">
+            <span class="text-xs font-mono text-zinc-400 block">Private Proving Session History (Node Specific):</span>
+            <div id="builder-history" class="space-y-2 text-xs font-mono">
+              <div class="p-3 rounded-xl bg-zinc-950/80 border border-white/5 text-zinc-400">
+                Session initiated. Zero telemetry logged yet for this node.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: SOURDOUGH TELEMETRY ==================== -->
+    <div id="view-telemetry" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/10 gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">Continuous Dough Telemetry</span>
+            <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20">Autonomous Compiler</span>
+          </div>
+          <h2 class="text-3xl font-black text-white">Live Dough Compilation & Pod Merging</h2>
+          <p class="text-xs text-zinc-400 mt-1">Autonomous Sourdough Agent synthesizes incoming telemetry, filters politics, and detects pod synergies.</p>
+        </div>
+        <div class="flex items-center gap-3 font-mono text-xs">
+          <span class="text-zinc-400">Latency: <strong class="text-amber-400">0.14s</strong></span>
+          <span class="text-zinc-400">•</span>
+          <span class="text-emerald-400">Air Gap: <strong>SECURE</strong></span>
+        </div>
+      </div>
+
+      <!-- Vector Progress Bar -->
+      <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 space-y-3">
+        <div class="flex justify-between items-center text-xs font-mono">
+          <span class="text-rose-400 font-bold">POINT A: $12k/mo Waste</span>
+          <span class="text-cyan-300 font-bold">RESOLUTION PROGRESS: <span id="progress-val">65%</span></span>
+          <span class="text-emerald-400 font-bold">POINT B: Zero Scrapped Parts</span>
+        </div>
+        <div class="w-full bg-zinc-950 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
+          <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-amber-400 via-cyan-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 65%;"></div>
+        </div>
+      </div>
+
+      <!-- Live 5-Builder Telemetry Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="telemetry-node-cards">
+        <!-- Dynamically populated or demo state -->
+      </div>
+
+      <!-- Autonomous Pod Merge Alert -->
+      <div id="pod-merge-alert" class="backdrop-blur-2xl bg-zinc-900/80 border border-amber-500/40 rounded-2xl p-5 space-y-3 shadow-xl">
+        <div class="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold">
+          <span>⚡</span>
+          <span>AUTONOMOUS POD MERGE DETECTED // POD ALPHA-02</span>
+        </div>
+        <p class="text-xs font-mono text-zinc-300 leading-relaxed">
+          The Sourdough Compiler detected complementary insights: <strong>#BUILDER-02</strong> identified the thermal cooldown tension delta, and <strong>#BUILDER-03</strong> verified the exact 18 ft-lb calibrated wrench preset. The engine merged both into <em>Pod Alpha-02</em> to compile the permanent machine instruction.
+        </p>
+      </div>
+
+      <!-- Compiled QuL8r Delta Card -->
+      <div class="backdrop-blur-2xl bg-zinc-950 border border-cyan-500/30 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <span class="text-xs font-mono uppercase tracking-widest text-cyan-400 font-bold">Current Compiled QuL8r Delta (The Mother Dough)</span>
+          <span class="text-[10px] font-mono bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/40">Hash: #QNS-REG-MANIFOLD-V2</span>
+        </div>
+
+        <div class="space-y-3 text-xs font-mono leading-relaxed">
+          <div class="p-3 rounded-xl bg-zinc-900/80 border border-white/5">
+            <span class="text-amber-400 font-bold block mb-1">⚡ Operational Hook:</span>
+            <p class="text-zinc-300">Line 2 Shift Handover Manifold Setup Protocol</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-900/80 border border-white/5">
+            <span class="text-cyan-400 font-bold block mb-1">📜 Context Argument:</span>
+            <p class="text-zinc-300">
+              Manifold runs at 140°F during day shift. Night shift starts at 75°F ambient. Torquing hot to standard 24 ft-lbs causes yield deformation upon cooldown. Torquing at 18 ft-lbs with pre-calibrated wrench #4 eliminates 100% of seal failures.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-900/80 border border-white/5">
+            <span class="text-emerald-400 font-bold block mb-1">🧠 Strategic Axiom:</span>
+            <p class="text-zinc-300">
+              "Never torque hot manifolds to cold specs. 18 ft-lbs cold preset or allow 45-min thermal settling."
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button onclick="switchTab('payday')" class="px-5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold font-mono text-xs tracking-wider uppercase transition shadow-lg shadow-emerald-500/20">
+            Proceed to Boss Payday Resolution →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: BOSS PAYDAY & CRA FINANCE REMITTANCE ==================== -->
+    <div id="view-payday" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/10 gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">Executive Settlement</span>
+            <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20">CRA Payroll Compliant</span>
+          </div>
+          <h2 class="text-3xl font-black text-white">Final Resolution & Anonymous Finance Remittance</h2>
+          <p class="text-xs text-zinc-400 mt-1">Point B reached. Payouts remain strictly anonymous to floor management, but filtered through Finance on regular payroll.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportPayrollCSV()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-mono text-xs text-zinc-200 transition flex items-center gap-2">
+            <span>📄</span> Export to Payroll CSV (T4 Code)
+          </button>
+        </div>
+      </div>
+
+      <!-- Resolution Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 text-center space-y-1">
+          <span class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">Annual Waste Eliminated</span>
+          <div class="text-3xl font-black font-mono text-emerald-400">$144,000</div>
+          <p class="text-[11px] font-mono text-zinc-400">Zero scrapped fittings in production</p>
+        </div>
+        <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 text-center space-y-1">
+          <span class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">Bounty Pool Released</span>
+          <div class="text-3xl font-black font-mono text-amber-400">$2,000 CAD</div>
+          <p class="text-[11px] font-mono text-zinc-400">Funded out of 1 week of scrap savings</p>
+        </div>
+        <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-5 text-center space-y-1">
+          <span class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">Status Sync Meetings Needed</span>
+          <div class="text-3xl font-black font-mono text-cyan-400">0</div>
+          <p class="text-[11px] font-mono text-zinc-400">100% Asynchronous Resolution</p>
+        </div>
+      </div>
+
+      <!-- Anonymous Voucher Allocation Table -->
+      <div class="backdrop-blur-2xl bg-zinc-900/60 border border-white/10 rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-white/10">
+          <div>
+            <h3 class="text-lg font-bold text-white font-mono">Anonymous Paystub Bonus Distribution</h3>
+            <p class="text-xs text-zinc-400">Vouchers match cryptographic token to role. Operators submit claim slips directly to Finance.</p>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 font-bold">100% Tax Deductible Operational Expense</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs font-mono text-left">
+            <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[10px] tracking-wider border-b border-white/10">
+              <tr>
+                <th class="py-3 px-4">Anonymous Token</th>
+                <th class="py-3 px-4">Role / Allocation</th>
+                <th class="py-3 px-4">Verified Impact</th>
+                <th class="py-3 px-4 text-right">Cash Bounty</th>
+                <th class="py-3 px-4 text-center">Payroll Remittance</th>
+              </tr>
+            </thead>
+            <tbody id="payday-table-body" class="divide-y divide-white/5 text-zinc-300">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Blind Finance Remittance Redemption Portal -->
+      <div class="backdrop-blur-2xl bg-gradient-to-br from-zinc-950 via-[#0d1424] to-zinc-950 border border-cyan-500/30 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🛡️</span>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-white font-mono">
+            Blind Finance Remittance Portal (Employee Self-Service)
+          </h3>
+        </div>
+        <p class="text-xs font-mono text-zinc-400 leading-relaxed">
+          Preserve complete anonymity on the shop floor. Enter your internal Employee ID and your anonymous claim token. The system generates a sealed Remittance Slip for Finance to process your bonus on the next regular payroll cycle (CRA T4 Box 14 compliant).
+        </p>
+
+        <form id="remittance-form" onsubmit="handleRemittanceSubmit(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <div>
+            <label class="block text-[11px] font-mono text-zinc-400 mb-1">Employee ID / Payroll #</label>
+            <input id="remit-emp-id" type="text" placeholder="e.g. EMP-4892" required class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-cyan-400">
+          </div>
+          <div>
+            <label class="block text-[11px] font-mono text-zinc-400 mb-1">Secret Claim Token ID</label>
+            <input id="remit-token-id" type="text" placeholder="#BLD-9281-03" required class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-amber-400 font-bold focus:outline-none focus:border-cyan-400">
+          </div>
+          <div class="flex items-end">
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold font-mono text-xs tracking-wider uppercase transition shadow-md">
+              Generate Remittance Slip →
+            </button>
+          </div>
+        </form>
+
+        <div id="remittance-result" class="hidden p-4 rounded-xl bg-zinc-900/90 border border-emerald-500/40 space-y-2 text-xs font-mono">
+          <!-- Dynamically populated remittance confirmation -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bid-Forward Modal (Reverse Intake Modal) -->
+  <div id="bid-forward-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-white/20 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 class="text-base font-bold text-white font-mono flex items-center gap-2">
+          <span class="text-cyan-400">💡</span> Propose New Bottleneck (Bid Forward)
+        </h3>
+        <button onclick="closeBidForwardModal()" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <form onsubmit="handleBidForwardSubmit(event)" class="space-y-3 text-xs font-mono">
+        <div>
+          <label class="block text-zinc-400 mb-1">Target Machine / Workflow</label>
+          <input id="bid-target" type="text" placeholder="e.g. CNC Lathe #3 Coolant Nozzle Drift" required class="w-full bg-zinc-950 border border-white/10 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-cyan-400">
+        </div>
+        <div>
+          <label class="block text-zinc-400 mb-1">Observed Bleed / Waste (Point A)</label>
+          <textarea id="bid-waste" rows="2" placeholder="e.g. Vibrates loose every 4 hours, causing 0.05mm runout. Scraps ~$1,800/mo in raw alloy." required class="w-full bg-zinc-950 border border-white/10 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-cyan-400"></textarea>
+        </div>
+        <div>
+          <label class="block text-zinc-400 mb-1">Proposed Fix Specification (Point B)</label>
+          <textarea id="bid-fix" rows="2" placeholder="e.g. Retrofit dual locking bracket + torque to 12 ft-lbs." required class="w-full bg-zinc-950 border border-white/10 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-cyan-400"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 mb-1">Requested Bounty Pool ($ CAD)</label>
+            <input id="bid-bounty" type="number" min="300" step="100" value="1200" required class="w-full bg-zinc-950 border border-white/10 rounded-xl p-2.5 text-amber-400 font-bold focus:outline-none focus:border-cyan-400">
+          </div>
+          <div>
+            <label class="block text-zinc-400 mb-1">Submitting Node Token</label>
+            <input id="bid-node-token" type="text" readonly class="w-full bg-zinc-950/60 border border-white/10 rounded-xl p-2.5 text-zinc-400 cursor-not-allowed">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeBidForwardModal()" class="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-mono text-xs">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold font-mono text-xs">Submit to Bid Board →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-6xl mt-8 pt-4 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-zinc-500 gap-2">
+    <div>IC ROOT & DIGAMONI ARCHITECTURE • 0% PECKING ORDER LATENCY</div>
+    <div class="text-zinc-400">"If we don't have the answer, it doesn't exist. And if it doesn't exist, we'll make a new one together."</div>
+  </footer>
+
+  <!-- SYSTEM JAVASCRIPT LOGIC -->
+  <script>
+    // System State
+    const state = {
+      activeTab: 'landing',
+      activeNode: 1,
+      fate: 'a',
+      bountyPool: 2000,
+      squadStatus: 'READY FOR INTAKE',
+      tokens: [
+        '#BLD-9281-01',
+        '#BLD-9281-02',
+        '#BLD-9281-03',
+        '#BLD-9281-04',
+        '#BLD-9281-05'
+      ],
+      telemetryNodes: [
+        { id: 1, token: '#BLD-9281-01', role: 'Tester (Attempt Floor)', gravity: 'Active Proving', status: 'Tested thread tolerances on batch #94.', bounty: 33.33 },
+        { id: 2, token: '#BLD-9281-02', role: 'Recon Partner (20%)', gravity: 'High (Recon)', status: 'Discovered thermal 65°F shrinkage delta.', bounty: 400.00 },
+        { id: 3, token: '#BLD-9281-03', role: 'Root-Cause Fixer (75%)', gravity: '100% (Point B)', status: 'Calibrated torque preset to 18 ft-lbs on wrench #4.', bounty: 1500.00 },
+        { id: 4, token: '#BLD-9281-04', role: 'Tester (Attempt Floor)', gravity: 'Active Proving', status: 'Verified seal ring seating geometry.', bounty: 33.33 },
+        { id: 5, token: '#BLD-9281-05', role: 'Tester (Attempt Floor)', gravity: 'Active Proving', status: 'Verified spindle runout baseline.', bounty: 33.34 }
+      ],
+      bidForwardItems: [
+        {
+          id: 'BF-101',
+          target: 'CNC Lathe #3 Coolant Nozzle Drift',
+          waste: 'Vibrates loose every 4 hours, causing 0.05mm runout. Scraps ~$1,800/mo.',
+          fix: 'Retrofit dual locking clamp bracket + 12 ft-lb torque lock.',
+          bounty: 1200,
+          endorsers: 3,
+          token: '#BLD-9281-02'
+        },
+        {
+          id: 'BF-102',
+          target: 'Spindle Bearing Preload Calibration',
+          waste: 'Bearing chatter on heavy cut cycles; replacement bearings costing $3,200/quarter.',
+          fix: 'Install calibrated preload shim pack B-4 to dampen harmonics.',
+          bounty: 1800,
+          endorsers: 2,
+          token: '#BLD-9281-05'
+        }
+      ]
+    };
+
+    // Tab Switching
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      const views = ['landing', 'boss', 'builder', 'telemetry', 'payday'];
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        const btn = document.getElementById('tab-' + v);
+        if (v === tabId) {
+          el.classList.remove('hidden');
+          btn.classList.add('active');
+        } else {
+          el.classList.add('hidden');
+          btn.classList.remove('active');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Dinosaur Quiz Logic
+    function runQuiz() {
+      const team = parseInt(document.getElementById('quiz-team').value);
+      const hours = parseInt(document.getElementById('quiz-hours').value);
+      const salary = parseInt(document.getElementById('quiz-salary').value);
+
+      document.getElementById('quiz-team-label').innerText = team + ' PEOPLE';
+      document.getElementById('quiz-hours-label').innerText = hours + ' HOURS / WK';
+      document.getElementById('quiz-salary-label').innerText = '$' + salary.toLocaleString() + ' / YR';
+
+      // Calculation
+      const hourly = salary / 2080;
+      const annualWaste = Math.round(team * hours * hourly * 50);
+      const reclaim = Math.round(annualWaste * 0.75);
+
+      document.getElementById('quiz-waste-display').innerText = '$' + annualWaste.toLocaleString();
+      document.getElementById('quiz-reclaim-display').innerText = '+$' + reclaim.toLocaleString();
+
+      let restraint = 65;
+      if (state.fate === 'a') restraint = 82;
+      if (state.fate === 'b') restraint = 94;
+      if (state.fate === 'c') restraint = 35;
+
+      document.getElementById('quiz-restraint-display').innerText = restraint + '% (' + (restraint > 70 ? 'CRITICAL' : 'EVALUATED') + ')';
+    }
+
+    function setFate(option) {
+      state.fate = option;
+      ['a', 'b', 'c'].forEach(o => {
+        const btn = document.getElementById('opt-fate-' + o);
+        if (o === option) {
+          btn.className = 'p-2.5 rounded-xl border border-amber-400 bg-amber-400/20 text-amber-200 font-mono text-xs text-left transition';
+        } else {
+          btn.className = 'p-2.5 rounded-xl border border-white/10 bg-white/[0.02] text-zinc-400 font-mono text-xs text-left transition hover:border-white/20';
+        }
+      });
+      runQuiz();
+    }
+
+    // Bounty Preview
+    function updateBountyPreview() {
+      const pool = parseFloat(document.getElementById('boss-bounty').value) || 2000;
+      state.bountyPool = pool;
+      const floorTotal = Math.round(pool * 0.05);
+      const floorPer = Math.round(floorTotal / 5);
+      const fixer = Math.round(pool * 0.75);
+      const recon = Math.round(pool * 0.20);
+
+      document.getElementById('split-floor').innerText = '$' + floorTotal + ' Pool ($' + floorPer + '/builder)';
+      document.getElementById('split-fixer').innerText = '$' + fixer.toLocaleString() + ' Primary';
+      document.getElementById('split-recon').innerText = '$' + recon.toLocaleString() + ' Dead-End Elimination';
+      document.getElementById('builder-bounty-display').innerText = '$' + pool.toLocaleString() + ' CAD';
+    }
+
+    // Boss Intake Handling
+    function handleBossIntake(e) {
+      e.preventDefault();
+      const company = document.getElementById('boss-company').value;
+      const title = document.getElementById('boss-problem-title').value;
+      const pointA = document.getElementById('boss-point-a').value;
+      const pointB = document.getElementById('boss-point-b').value;
+      const pool = state.bountyPool;
+
+      // Update Builder Assigned Target
+      document.getElementById('builder-assigned-target').innerText = title;
+      document.getElementById('builder-point-a').innerText = pointA;
+      document.getElementById('builder-point-b').innerText = pointB;
+
+      // Update Status
+      state.squadStatus = 'DEPLOYED // 5 AIR-GAPPED NODES ACTIVE';
+      const statusBadge = document.getElementById('boss-squad-status');
+      statusBadge.innerText = state.squadStatus;
+      statusBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-400/10 text-emerald-400 border border-emerald-400/30';
+
+      alert('⚡ Sourdough Squad Deployed! 5 Anonymous Builder Air-Gap Links have been provisioned.');
+      renderTokens();
+      switchTab('builder');
+    }
+
+    function renderTokens() {
+      const container = document.getElementById('builder-token-list');
+      container.innerHTML = state.tokens.map((t, idx) => `
+        <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-950/80 border border-white/5">
+          <span class="text-zinc-300 font-bold">${t}</span>
+          <button onclick="copyTokenLink('${t}')" class="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-[10px] text-cyan-300 border border-white/10 transition">
+            Copy Link
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function copyTokenLink(token) {
+      navigator.clipboard.writeText('https://icroot.ca/b/' + token.replace('#', ''));
+      alert('Copied air-gapped claim link for ' + token);
+    }
+
+    // Builder Proving Ground
+    function selectBuilderNode(nodeId) {
+      state.activeNode = nodeId;
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById('btn-node-' + i);
+        if (i === nodeId) {
+          btn.className = 'px-2.5 py-1 rounded-lg bg-cyan-400 text-black font-bold';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white';
+        }
+      }
+      const token = state.tokens[nodeId - 1];
+      document.getElementById('active-node-header').innerText = `ACTIVE: #BUILDER-0${nodeId} (Air-Gapped Private Session)`;
+      document.getElementById('active-node-token').innerText = token;
+      
+      const nodeData = state.telemetryNodes[nodeId - 1];
+      const hist = document.getElementById('builder-history');
+      hist.innerHTML = `
+        <div class="p-3 rounded-xl bg-zinc-950/80 border border-white/5 text-zinc-300 space-y-1">
+          <div class="flex justify-between text-zinc-500 text-[10px]">
+            <span>ROLE: ${nodeData.role}</span>
+            <span>BOUNTY EARNED: $${nodeData.bounty.toFixed(2)} CAD</span>
+          </div>
+          <div>${nodeData.status}</div>
+        </div>
+      `;
+    }
+
+    function injectBuilderObservation(label, text) {
+      const textarea = document.getElementById('builder-notes');
+      textarea.value = `[${label}]: ` + text;
+    }
+
+    function toggleVoiceSim() {
+      const status = document.getElementById('voice-status');
+      const btn = document.getElementById('btn-voice');
+      if (status.classList.contains('hidden')) {
+        status.classList.remove('hidden');
+        btn.classList.add('pulse-recording');
+        setTimeout(() => {
+          document.getElementById('builder-notes').value = "Tested thermal cooling delta on Line 2 fitting. Temperature dropped from 140°F to 75°F over shift break. Verified torque requirement shifts to 18 ft-lbs.";
+          status.classList.add('hidden');
+          btn.classList.remove('pulse-recording');
+        }, 2200);
+      } else {
+        status.classList.add('hidden');
+        btn.classList.remove('pulse-recording');
+      }
+    }
+
+    function submitBuilderObservation() {
+      const notes = document.getElementById('builder-notes').value;
+      if (!notes) {
+        alert('Please enter or dictate telemetry notes.');
+        return;
+      }
+      const node = state.telemetryNodes[state.activeNode - 1];
+      node.status = notes;
+      alert(`Telemetry transmitted securely from ${node.token} to Sourdough Compiler.`);
+      document.getElementById('builder-notes').value = '';
+      selectBuilderNode(state.activeNode);
+      renderTelemetryCards();
+      switchTab('telemetry');
+    }
+
+    function updateIntensity() {
+      const val = document.getElementById('ai-intensity').value;
+      const label = document.getElementById('ai-intensity-label');
+      const desc = document.getElementById('ai-intensity-desc');
+      if (val === '1') {
+        label.innerText = 'LEVEL 1: PASSIVE LOGGER';
+        desc.innerText = 'Transcribes notes and logs telemetry timestamps without feedback.';
+      } else if (val === '2') {
+        label.innerText = 'LEVEL 2: SANITIZER';
+        desc.innerText = 'Filters emotional language and translates shop-floor slang into engineering specifications.';
+      } else if (val === '3') {
+        label.innerText = 'LEVEL 3: SOCRATIC SPARRING';
+        desc.innerText = 'Active co-builder. Validates engineering tolerances, checks math, spots edge cases, and prepares QuL8r deltas.';
+      } else {
+        label.innerText = 'LEVEL 4: AUTONOMOUS POD COMPILER';
+        desc.innerText = 'Actively matches complementary field discoveries across nodes and drafts complete SOP directives.';
+      }
+    }
+
+    // Telemetry Grid Rendering
+    function renderTelemetryCards() {
+      const container = document.getElementById('telemetry-node-cards');
+      container.innerHTML = state.telemetryNodes.map(n => `
+        <div class="backdrop-blur-2xl bg-zinc-950/90 border ${n.id === 3 ? 'border-emerald-500/50' : n.id === 2 ? 'border-cyan-500/50' : 'border-white/10'} rounded-2xl p-4 space-y-2 font-mono text-xs">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="text-zinc-500">#0${n.id}</span>
+            <span class="font-bold ${n.id === 3 ? 'text-emerald-400' : n.id === 2 ? 'text-cyan-400' : 'text-amber-400'}">${n.token}</span>
+          </div>
+          <div class="font-bold text-white text-[11px]">${n.role}</div>
+          <p class="text-zinc-400 text-[11px] leading-relaxed line-clamp-3">${n.status}</p>
+          <div class="pt-2 border-t border-white/5 flex justify-between items-center text-[10px]">
+            <span class="text-zinc-500">Allocation:</span>
+            <span class="text-emerald-300 font-bold">$${n.bounty.toFixed(2)} CAD</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Payday & Remittance
+    function renderPaydayTable() {
+      const tbody = document.getElementById('payday-table-body');
+      tbody.innerHTML = state.telemetryNodes.map(n => `
+        <tr class="hover:bg-zinc-900/50 transition">
+          <td class="py-3 px-4 font-bold text-white">${n.token}</td>
+          <td class="py-3 px-4 text-cyan-300">${n.role}</td>
+          <td class="py-3 px-4 text-zinc-400">${n.status}</td>
+          <td class="py-3 px-4 text-right font-bold text-emerald-400">$${n.bounty.toFixed(2)} CAD</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="prefillRemittance('${n.token}')" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-cyan-300 text-[10px] border border-white/10">
+              Claim via Finance
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function prefillRemittance(token) {
+      document.getElementById('remit-token-id').value = token;
+      document.getElementById('remit-emp-id').focus();
+    }
+
+    function handleRemittanceSubmit(e) {
+      e.preventDefault();
+      const empId = document.getElementById('remit-emp-id').value;
+      const tokenId = document.getElementById('remit-token-id').value;
+
+      const node = state.telemetryNodes.find(n => n.token === tokenId);
+      if (!node) {
+        alert('Invalid claim token. Please verify token ID.');
+        return;
+      }
+
+      const resBox = document.getElementById('remittance-result');
+      resBox.classList.remove('hidden');
+      resBox.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-white/10">
+          <span class="text-emerald-400 font-bold">✓ FINANCE REMITTANCE SLIP GENERATED (CRA COMPLIANT)</span>
+          <span class="text-zinc-500 text-[10px]">TIMESTAMP: ${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1 text-zinc-300">
+          <div>Employee ID: <strong class="text-white">${empId}</strong></div>
+          <div>Matched Token: <strong class="text-amber-400">${tokenId}</strong></div>
+          <div>Bonus Payable: <strong class="text-emerald-400">$${node.bounty.toFixed(2)} CAD</strong></div>
+          <div>CRA Line Code: <strong class="text-cyan-300">T4 Box 14 (Continuous Improvement Bonus)</strong></div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-zinc-950 border border-white/10 text-[11px] text-zinc-400 mt-2">
+          <strong>Internal Confidentiality Guarantee:</strong> This voucher is transmitted directly to Central Payroll. Plant Floor supervisors and shift peers have zero record of who claimed this token.
+        </div>
+      `;
+    }
+
+    function exportPayrollCSV() {
+      let csv = "Employee_ID,Anonymous_Token_ID,Bonus_Amount_CAD,Tax_Code,Role,Authorization_Date\n";
+      state.telemetryNodes.forEach(n => {
+        csv += `UNASSIGNED_PENDING_CLAIM,${n.token},${n.bounty.toFixed(2)},T4_BOX_14,${n.role.replace(/,/g, '')},${new Date().toISOString().slice(0, 10)}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'ICRoot_Payroll_Remittance_' + new Date().toISOString().slice(0, 10) + '.csv');
+      a.click();
+    }
+
+    // Bid Forward Modal & Board
+    function renderBidForwardBoard() {
+      const container = document.getElementById('bid-forward-list');
+      container.innerHTML = state.bidForwardItems.map(item => `
+        <div class="p-4 rounded-xl bg-zinc-950/80 border border-white/10 space-y-2.5 font-mono text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-cyan-400 font-bold">${item.id} // ${item.target}</span>
+            <span class="text-[10px] text-zinc-500">${item.token}</span>
+          </div>
+          <div>
+            <span class="text-rose-400 font-bold block text-[10px]">OBSERVED WASTE:</span>
+            <p class="text-zinc-400 text-[11px]">${item.waste}</p>
+          </div>
+          <div>
+            <span class="text-emerald-400 font-bold block text-[10px]">PROPOSED SPEC (POINT B):</span>
+            <p class="text-zinc-400 text-[11px]">${item.fix}</p>
+          </div>
+          <div class="pt-2 border-t border-white/5 flex justify-between items-center">
+            <span class="text-amber-400 font-bold">$${item.bounty.toLocaleString()} CAD Pool</span>
+            <button onclick="approveBidForward('${item.id}')" class="px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-[10px] transition">
+              ⚡ Fund Problem Squad
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openBidForwardModal() {
+      document.getElementById('bid-node-token').value = state.tokens[state.activeNode - 1];
+      document.getElementById('bid-forward-modal').classList.remove('hidden');
+    }
+
+    function closeBidForwardModal() {
+      document.getElementById('bid-forward-modal').classList.add('hidden');
+    }
+
+    function handleBidForwardSubmit(e) {
+      e.preventDefault();
+      const target = document.getElementById('bid-target').value;
+      const waste = document.getElementById('bid-waste').value;
+      const fix = document.getElementById('bid-fix').value;
+      const bounty = parseFloat(document.getElementById('bid-bounty').value) || 1000;
+      const token = document.getElementById('bid-node-token').value;
+
+      const newId = 'BF-' + (state.bidForwardItems.length + 101);
+      state.bidForwardItems.unshift({
+        id: newId,
+        target: target,
+        waste: waste,
+        fix: fix,
+        bounty: bounty,
+        endorsers: 1,
+        token: token
+      });
+
+      alert('Bid-Forward Bottleneck posted to the Reverse Intake Board!');
+      closeBidForwardModal();
+      renderBidForwardBoard();
+    }
+
+    function approveBidForward(id) {
+      const item = state.bidForwardItems.find(b => b.id === id);
+      if (!item) return;
+      document.getElementById('boss-problem-title').value = item.target;
+      document.getElementById('boss-point-a').value = item.waste;
+      document.getElementById('boss-point-b').value = item.fix;
+      document.getElementById('boss-bounty').value = item.bounty;
+      updateBountyPreview();
+      alert(`Loaded ${item.target} into Boss Operational Console. Review and click "Ingest Problem" to launch!`);
+      switchTab('boss');
+    }
+
+    // Demo Scenario Preloader
+    function loadDemoScenario() {
+      document.getElementById('boss-company').value = "DynaIndustrial LP (Regina Plant)";
+      document.getElementById('boss-email').value = "ops-director@dynaindustrial.com";
+      document.getElementById('boss-problem-title').value = "Line 2 Secondary Manifold Handover Fitting Failure";
+      document.getElementById('boss-point-a').value = "Recurring fitting deformation on Line 2 secondary manifold during shift handover. Scrapping $12,000/mo in custom machined parts. Day shift blames night shift; night shift blames torque specs.";
+      document.getElementById('boss-point-b').value = "Zero scrapped fittings across 14 consecutive shifts. Standardized thermal torque calibration identified and verified before spindle engage.";
+      document.getElementById('boss-bounty').value = 2000;
+      updateBountyPreview();
+      renderTokens();
+      renderTelemetryCards();
+      renderPaydayTable();
+      renderBidForwardBoard();
+      runQuiz();
+      alert("⚡ Loaded Regina Machine Shop Handover scenario across all modules!");
+    }
+
+    function resetSystem() {
+      location.reload();
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      runQuiz();
+      updateBountyPreview();
+      renderTokens();
+      renderTelemetryCards();
+      renderPaydayTable();
+      renderBidForwardBoard();
+      selectBuilderNode(1);
+    });
+  </script>
+</body>
+</html>
+
